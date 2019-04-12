@@ -74,6 +74,54 @@ window.addEventListener("load",function() {
 	  }
 	});
 
+	Q.Sprite.extend("Bloopa",{
+	  init: function(p) {
+	    this._super(p, { sheet: 'bloopa', vx: 0, vy: -140, rangeY: 90,
+				gravity: 0,
+				jumpSpeed: -230});
+	    this.p.initialY = this.p.y;
+	    this.add('2d, aiBounce');
+	    
+	    this.on("bump.left,bump.right,bump.bottom",function(collision) {
+	      if(collision.obj.isA("Player")) { 
+	        Q.stageScene("endGame",1, { label: "You Died" }); 
+	        collision.obj.destroy();
+	      }
+	    });
+	    
+	    this.on("bump.top",function(collision) {
+	      if(collision.obj.isA("Player")) { 
+	        this.destroy();
+	        collision.obj.p.vy = -300;
+	      }
+	    });
+	  },
+
+	  step: function(dt) {
+			if(this.p.dead) {
+				this.del('2d, aiBounce');
+				this.p.deadTimer++;
+				if (this.p.deadTimer > 24) {
+					this.destroy();
+				}
+				return;
+			}
+			if(this.p.vy == 0){
+				this.p.vy = -150;
+			}
+			if(this.p.y >= this.p.initialY) {		
+				this.p.y = this.p.initialY;
+				this.p.vy = -this.p.vy;
+			} 
+			else if(this.p.y + this.p.rangeY < this.p.initialY) {	
+				this.p.y = this.p.initialY - this.p.rangeY;
+				this.p.vy = -this.p.vy;
+			}
+		}
+	});
+
+
+
 	Q.loadTMX("level.tmx, mario_small.json, mario_small.png, goomba.json, goomba.png, bloopa.json, bloopa.png", function(){
 		Q.compileSheets("mario_small.png","mario_small.json");
 		Q.compileSheets("goomba.png","goomba.json");
@@ -94,8 +142,11 @@ window.addEventListener("load",function() {
 	  stage.viewport.offsetX = -Q.width*30/100;
   	  stage.viewport.offsetY = Q.height*33/100;
 
-  	  stage.insert(new Q.Goomba({ x: 300, y: 380 }));
-  	  stage.insert(new Q.Goomba({ x: 500, y: 380 }));
+  	  //stage.insert(new Q.Goomba({ x: 300, y: 380 }));
+  	  stage.insert(new Q.Bloopa({ x: 350, y: 525 }));
+  	  stage.insert(new Q.Bloopa({ x: 370, y: 525 }));
+  	  stage.insert(new Q.Bloopa({ x: 320, y: 525 }));
+
 
 	  //stage.centerOn(150, 380);
 
