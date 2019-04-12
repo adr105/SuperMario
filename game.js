@@ -19,13 +19,19 @@ window.addEventListener("load",function() {
 				sheet: "mario_small",
 				sprite: "mario_small",
 			    x: 150,
-			    y: 380,
+			    y: 500,
 			    die: false,
 			    type: Q.PLAYER,
 			    collisionMask: Q.SPRITE_DEFAULT | Q.COIN,
 			    win: false
 			});
 	    this.add('2d, platformerControls');
+	    this.on("hit.sprite",function(collision) {
+	      if(collision.obj.isA("Princess")) {
+	        Q.stageScene("endGame",1, { label: "You Won!" }); 
+	        this.destroy();
+	      }
+	    });
 
 		},
 
@@ -51,6 +57,12 @@ window.addEventListener("load",function() {
   		}
 
 
+	});
+
+	Q.Sprite.extend("Princess", {
+	  init: function(p) {
+	    this._super(p, { sheet: 'princess', sprite: "princess", });
+	  }
 	});
 
 	Q.Sprite.extend("Goomba",{
@@ -120,9 +132,23 @@ window.addEventListener("load",function() {
 		}
 	});
 
+	Q.scene('mainMenu',function(stage) {
+	  var background = stage.insert(new Q.UI.Button({
+	      asset: 'mainTitle.png',
+	      x: Q.width/2,
+	      y: Q.height/2
+	  }));
+
+	  var button = stage.insert(new Q.UI.Button({ x: Q.width/2, y: Q.height/2 + Q.height/4, fill: "#E76318", label: "PRES HERE TO PLAY", color: "#F7D6B5" }))
+	  background.on("click",function() {
+	    Q.clearStages();
+	    Q.stageScene('level1');
+	    Q.stageScene('hud', 3, Q('Player').first().p);
+	  });
+	});
 
 
-	Q.loadTMX("level.tmx, mario_small.json, mario_small.png, goomba.json, goomba.png, bloopa.json, bloopa.png", function(){
+	Q.loadTMX("level.tmx, mario_small.json, mario_small.png, goomba.json, goomba.png, bloopa.json, bloopa.png, princess.png, mainTitle.png, tiles.json, tiles.png, coin.png", function(){
 		Q.compileSheets("mario_small.png","mario_small.json");
 		Q.compileSheets("goomba.png","goomba.json");
 		Q.compileSheets("bloopa.png","bloopa.json");
@@ -131,7 +157,8 @@ window.addEventListener("load",function() {
 		Q.sheet("mario_small","mario_small.png", { tilew: 32, tileh: 32 });
 		Q.sheet("goomba","goomba.png", { tilew: 32, tileh: 32 });
 		Q.sheet("bloopa","bloopa.png", { tilew: 32, tileh: 32 });
-		Q.stageScene("level1");
+		Q.sheet("princess","princess.png", { tilew: 32, tileh: 32 });
+		Q.stageScene("mainMenu");
 
 	});
 
@@ -142,13 +169,15 @@ window.addEventListener("load",function() {
 	  stage.viewport.offsetX = -Q.width*30/100;
   	  stage.viewport.offsetY = Q.height*33/100;
 
-  	  //stage.insert(new Q.Goomba({ x: 300, y: 380 }));
-  	  stage.insert(new Q.Bloopa({ x: 350, y: 525 }));
+  	  stage.insert(new Q.Goomba({ x: 300, y: 380 }));
+  	  
+  	  //stage.insert(new Q.Bloopa({ x: 350, y: 525 }));
   	  stage.insert(new Q.Bloopa({ x: 370, y: 525 }));
   	  stage.insert(new Q.Bloopa({ x: 320, y: 525 }));
-
-
+	
+  	  stage.insert(new Q.Princess({ x: 80, y: 500 }));
 	  //stage.centerOn(150, 380);
+	 
 
 	 });
 
@@ -163,7 +192,7 @@ window.addEventListener("load",function() {
 	                                        label: stage.options.label }));
 	  button.on("click",function() {
 	    Q.clearStages();
-	    Q.stageScene('level1');
+	    Q.stageScene('mainMenu');
 	  });
 	  box.fit(20);
 	});
