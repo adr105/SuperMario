@@ -4225,7 +4225,7 @@
   <object id="362" name="Coin" gid="28" x="2990.33" y="161" width="34" height="34"/>
   <object id="364" name="Coin" gid="28" x="2710" y="571.333" width="34" height="34"/>
   <object id="365" name="Coin" gid="28" x="2904.33" y="540" width="34" height="34"/>
-  <object id="414" name="Coin" gid="28" x="204.333" y="475" width="34" height="34"/>
+  <object id="414" name="Coin" gid="28" x="241.333" y="474" width="34" height="34"/>
   <object id="418" name="Coin" gid="28" x="1779" y="279" width="34" height="34"/>
  </objectgroup>
  <objectgroup id="5" name="Meta">

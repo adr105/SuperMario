@@ -22,7 +22,8 @@ window.addEventListener("load",function() {
             die: false,
             type: Q.PLAYER,
             collisionMask: Q.SPRITE_DEFAULT | Q.COIN,
-            win: false
+            win: false,
+            score: 0
             
           });
         this.add('2d, platformerControls, animation'); 
@@ -248,17 +249,49 @@ window.addEventListener("load",function() {
     Q.Sprite.extend("Collectable", {
       init: function(p) {
         this._super(p,{
-          sheet: p.sprite,
+          sheet: 'coin',
           type: Q.COIN,
           collisionMask: Q.PLAYER,
           vx: 0,
           vy: 0,
           gravity: 0,
-          picked: false
+          picked: false,
+          sensor: true
         });
         this.add("animation");
+        this.add('tween');
     	  this.play("shiny");
+        this.on("sensor");
+      },
+
+      sensor: function(colObj) {
+        if (this.p.amount && this.p.picked == false) {
+          colObj.p.score += this.p.amount;
+          Q.stageScene('hud', 3, colObj.p);
+        }
+        
+        this.p.picked = true;
+      },
+    
+      step: function(dt){
+        if(this.p.picked == true){
+          this.p.y = this.p.y-20;
+        }
+        if(this.p.y < 0) {
+          this.destroy();
+        }
       }
+
+    });
+
+    Q.scene('hud',function(stage) {
+      var container = stage.insert(new Q.UI.Container({
+        x: 50, y: 0
+      }));
+
+      var label = container.insert(new Q.UI.Text({x:20, y: 20,
+        label: "Score: " + stage.options.score, color: "white" }));
+      container.fit(20);
     });
 
 
@@ -273,6 +306,7 @@ window.addEventListener("load",function() {
       background.on("click",function() {
         Q.clearStages();
         Q.stageScene('level1');
+        Q.stageScene('hud', 3, Q('Player').first().p);
       });
     });
 
@@ -302,7 +336,7 @@ window.addEventListener("load",function() {
           });
 
         Q.animations("coin", {
-          shiny: { frames: [0,1,2], rate: 1/6, flip: 'x', loop: true }
+          shiny: { frames: [0,1,2], rate: 1/5, flip: 'x', loop: true }
           });
 
 
